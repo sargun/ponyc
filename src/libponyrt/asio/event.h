@@ -12,15 +12,27 @@ PONY_EXTERN_C_BEGIN
  *
  *  Used to carry user defined data for event notifications.
  */
+
+union asio_event_attr {
+  struct {            /* timer data */
+    uint64_t  nsec;   /* nanoseconds for timers */
+  };
+  struct {            /* signal handler data */
+    int signal;
+  };
+  struct {
+    int fd;           /* file descriptor */
+  };
+};
+
 typedef struct asio_event_t
 {
   struct asio_event_t* magic;
   pony_actor_t* owner;  /* owning actor */
   uint32_t msg_id;      /* I/O handler (actor message) */
-  int fd;               /* file descriptor */
   uint32_t flags;       /* event filter flags */
+  union asio_event_attr asio_event_attr;
   bool noisy;           /* prevents termination? */
-  uint64_t nsec;        /* nanoseconds for timers */
 
 #ifdef PLATFORM_IS_LINUX
   // automagically resubscribe to an event on an FD when another event is
@@ -51,9 +63,18 @@ typedef struct asio_msg_t
  *
  *  An event is noisy, if it should prevent the runtime system from terminating
  *  based on quiescence.
+ *
+ *  Event allocation and subscription occur in two different steps. Event
+ *  allocation requires a call to allocate memory for the event. There
+ *  are setters to populate the event prior to "creating" the event.
  */
-PONY_API asio_event_t* pony_asio_event_create(pony_actor_t* owner, int fd,
-  uint32_t flags, uint64_t nsec, bool noisy);
+PONY_API asio_event_t* pony_asio_event_alloc(pony_actor_t* owner,
+  uint32_t flags, bool noisy);
+PONY_API void pony_asio_event_subscribe(asio_event_t* ev);
+
+PONY_API void pony_asio_event_set_nsec(asio_event_t* ev, int nsec);
+PONY_API void pony_asio_event_set_fd(asio_event_t* ev, int fd);
+PONY_API void pony_asio_event_set_signal(asio_event_t* ev, int signal);
 
 /** Deallocates an ASIO event.
  */
@@ -75,14 +96,16 @@ PONY_API void pony_asio_event_send(asio_event_t* ev, uint32_t flags,
  *
  *  Subscriptions are not incremental. Registering an event multiple times will
  *  overwrite the previous event filter mask.
+ *
+ *  This is the per-ASIO provider implementation of pony_asio_event_subscribe.
  */
-PONY_API void pony_asio_event_subscribe(asio_event_t* ev);
+PONY_API void __pony_asio_event_subscribe(asio_event_t* ev);
 
 /** Update an event.
  *
  * Used for timers.
  */
-PONY_API void pony_asio_event_setnsec(asio_event_t* ev, uint64_t nsec);
+PONY_API void pony_asio_event_update_nsec(asio_event_t* ev, uint64_t nsec);
 
 /** Unsubscribe an event.
  *
