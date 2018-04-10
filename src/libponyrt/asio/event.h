@@ -13,31 +13,38 @@ PONY_EXTERN_C_BEGIN
  *  Used to carry user defined data for event notifications.
  */
 
-union asio_event_attr
-{
-  struct
-  {
-    int       timer_fd; /* This is used on Linux for timerfd, and not exposed to Pony */
-    uint64_t  nsec; /* nanoseconds for timers */
-  } timer_data;
-  struct
-  {
-    int event_fd;
-    int signal; /* signal to subscribe / unsubscribe on */
-  } signal_data;
-  struct
-  {
-    int fd; /* file descriptor */
-  } io_data;
-};
-
 typedef struct asio_event_t
 {
   struct asio_event_t* magic;
   pony_actor_t* owner;  /* owning actor */
   uint32_t msg_id;      /* I/O handler (actor message) */
   uint32_t flags;       /* event filter flags */
-  union asio_event_attr asio_event_attr;
+  union
+  {
+    /*
+     * This exists as a shared component, amongst all objects which have an FD as the first member.
+     * Rather than places where that FD is shared between multiple components (eventfd, timer fd, etc..),
+     * and all of those components have some common registration being broken out, they can use this
+     * one directly.
+     */
+    struct {
+        int shared_fd;
+    };
+    struct
+    {
+      int       timer_fd; /* This is used on Linux for timerfd, and not exposed to Pony */
+      uint64_t  nsec; /* nanoseconds for timers */
+    } timer_data;
+    struct
+    {
+      int event_fd;
+      int signal; /* signal to subscribe / unsubscribe on */
+    } signal_data;
+    struct
+    {
+      int fd; /* file descriptor */
+    } io_data;
+  };
   bool noisy;           /* prevents termination? */
 
 #ifdef PLATFORM_IS_LINUX
