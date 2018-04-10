@@ -16,10 +16,7 @@
 #include <string.h>
 #include <signal.h>
 #include <stdbool.h>
-
-#ifdef USE_VALGRIND
-#include <valgrind/helgrind.h>
-#endif
+#include "../common.h"
 
 #define MAX_SIGNAL 128
 
@@ -61,9 +58,7 @@ static void signal_handler(int sig)
   asio_event_t* ev = atomic_load_explicit(&b->sighandlers[sig],
     memory_order_acquire);
 
-#ifdef USE_VALGRIND
-  ANNOTATE_HAPPENS_AFTER(&b->sighandlers[sig]);
-#endif
+  PONYINT_ANNOTATE_HAPPENS_AFTER(&b->sighandlers[sig]);
 
   if(ev == NULL)
     return;
@@ -349,9 +344,7 @@ PONY_API void pony_asio_event_subscribe(asio_event_t* ev)
     int sig = (int)ev->nsec;
     asio_event_t* prev = NULL;
 
-#ifdef USE_VALGRIND
-    ANNOTATE_HAPPENS_BEFORE(&b->sighandlers[sig]);
-#endif
+    PONYINT_ANNOTATE_HAPPENS_BEFORE(&b->sighandlers[sig]);
     if((sig < MAX_SIGNAL) &&
       atomic_compare_exchange_strong_explicit(&b->sighandlers[sig], &prev, ev,
       memory_order_release, memory_order_relaxed))
@@ -442,9 +435,7 @@ PONY_API void pony_asio_event_unsubscribe(asio_event_t* ev)
     int sig = (int)ev->nsec;
     asio_event_t* prev = ev;
 
-#ifdef USE_VALGRIND
-    ANNOTATE_HAPPENS_BEFORE(&b->sighandlers[sig]);
-#endif
+    PONYINT_ANNOTATE_HAPPENS_BEFORE(&b->sighandlers[sig]);
     if((sig < MAX_SIGNAL) &&
       atomic_compare_exchange_strong_explicit(&b->sighandlers[sig], &prev, NULL,
       memory_order_release, memory_order_relaxed))
