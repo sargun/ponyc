@@ -32,19 +32,19 @@ PONY_API asio_event_t* pony_asio_event_alloc(pony_actor_t* owner,
 }
 
 // TODO: Validate these settings
-PONY_API void pony_asio_event_set_nsec(asio_event_t* ev, int nsec)
+PONY_API void pony_asio_event_set_nsec(asio_event_t* ev, uint64_t nsec)
 {
-  ev->asio_event_attr.nsec = nsec;
+  ev->asio_event_attr.timer_data.nsec = nsec;
 }
 
 PONY_API void pony_asio_event_set_fd(asio_event_t* ev, int fd)
 {
-  ev->asio_event_attr.fd = fd;
+  ev->asio_event_attr.io_data.fd = fd;
 }
 
 PONY_API void pony_asio_event_set_signal(asio_event_t* ev, int signal)
 {
-  ev->asio_event_attr.signal = signal;
+  ev->asio_event_attr.signal_data.signal = signal;
 }
 
 PONY_API void pony_asio_event_subscribe(asio_event_t* ev)
@@ -58,7 +58,7 @@ PONY_API void pony_asio_event_subscribe(asio_event_t* ev)
   pony_traceknown(ctx, ev->owner, type, PONY_TRACE_OPAQUE);
   pony_send_done(ctx);
 
-  __pony_asio_event_subscribe(ev);
+  ponyint_pony_asio_event_subscribe(ev);
 }
 
 PONY_API void pony_asio_event_destroy(asio_event_t* ev)
@@ -86,7 +86,7 @@ PONY_API int pony_asio_event_fd(asio_event_t* ev)
   if(ev == NULL)
     return -1;
 
-  return ev->asio_event_attr.fd;
+  return ev->asio_event_attr.io_data.fd;
 }
 
 PONY_API bool pony_asio_event_get_writeable(asio_event_t* ev)
@@ -122,7 +122,7 @@ PONY_API uint64_t pony_asio_event_nsec(asio_event_t* ev)
   if(ev == NULL)
     return 0;
 
-  return ev->asio_event_attr.nsec;
+  return ev->asio_event_attr.timer_data.nsec;
 }
 
 PONY_API void pony_asio_event_send(asio_event_t* ev, uint32_t flags,

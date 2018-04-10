@@ -13,16 +13,22 @@ PONY_EXTERN_C_BEGIN
  *  Used to carry user defined data for event notifications.
  */
 
-union asio_event_attr {
-  struct {          /* timer data */
+union asio_event_attr
+{
+  struct
+  {
+    int       timer_fd; /* This is used on Linux for timerfd, and not exposed to Pony */
     uint64_t  nsec; /* nanoseconds for timers */
-  };
-  struct {      /* signal handler data */
+  } timer_data;
+  struct
+  {
+    int event_fd;
     int signal; /* signal to subscribe / unsubscribe on */
-  };
-  struct {  /* I/O Data */
+  } signal_data;
+  struct
+  {
     int fd; /* file descriptor */
-  };
+  } io_data;
 };
 
 typedef struct asio_event_t
@@ -72,7 +78,7 @@ PONY_API asio_event_t* pony_asio_event_alloc(pony_actor_t* owner,
   uint32_t flags, bool noisy);
 PONY_API void pony_asio_event_subscribe(asio_event_t* ev);
 
-PONY_API void pony_asio_event_set_nsec(asio_event_t* ev, int nsec);
+PONY_API void pony_asio_event_set_nsec(asio_event_t* ev, uint64_t nsec);
 PONY_API void pony_asio_event_set_fd(asio_event_t* ev, int fd);
 PONY_API void pony_asio_event_set_signal(asio_event_t* ev, int signal);
 

@@ -339,8 +339,8 @@ void ponyint_pony_asio_event_subscribe(asio_event_t* ev)
 
   if(ev->flags & ASIO_TIMER)
   {
-    ev->asio_event_attr.fd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
-    timer_set_nsec(ev->asio_event_attr.fd, ev->asio_event_attr.nsec);
+    ev->asio_event_attr.timer_data.timer_fd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
+    timer_set_nsec(ev->asio_event_attr.timer_data.timer_fd, ev->asio_event_attr.nsec);
     ep.events |= EPOLLIN;
   }
 
@@ -393,7 +393,7 @@ PONY_API void pony_asio_event_update_nsec(asio_event_t* ev, uint64_t nsec)
   if(ev->flags & ASIO_TIMER)
   {
     ev->asio_event_attr.nsec = nsec;
-    timer_set_nsec(ev->asio_event_attr.fd, nsec);
+    timer_set_nsec(ev->asio_event_attr.timer_data.timer_fd, nsec);
   }
 }
 
@@ -430,10 +430,10 @@ PONY_API void pony_asio_event_unsubscribe(asio_event_t* ev)
 
   if(ev->flags & ASIO_TIMER)
   {
-    if(ev->asio_event_attr.fd != -1)
+    if(ev->asio_event_attr.timer_data.timer_fd != -1)
     {
-      close(ev->asio_event_attr.fd);
-      ev->asio_event_attr.fd = -1;
+      close(ev->asio_event_attr.timer_data.timer_fd);
+      ev->asio_event_attr.timer_data.timer_fd = -1;
     }
   }
 
