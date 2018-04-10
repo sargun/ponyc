@@ -14,14 +14,14 @@ PONY_EXTERN_C_BEGIN
  */
 
 union asio_event_attr {
-  struct {            /* timer data */
-    uint64_t  nsec;   /* nanoseconds for timers */
+  struct {          /* timer data */
+    uint64_t  nsec; /* nanoseconds for timers */
   };
-  struct {            /* signal handler data */
-    int signal;
+  struct {      /* signal handler data */
+    int signal; /* signal to subscribe / unsubscribe on */
   };
-  struct {
-    int fd;           /* file descriptor */
+  struct {  /* I/O Data */
+    int fd; /* file descriptor */
   };
 };
 
