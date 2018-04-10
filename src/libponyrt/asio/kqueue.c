@@ -303,7 +303,7 @@ PONY_API void __pony_asio_event_subscribe(asio_event_t* ev)
   {
 #ifdef PLATFORM_IS_BSD
     EV_SET(&event[i], (uintptr_t)ev, EVFILT_TIMER, EV_ADD | EV_ONESHOT,
-      0, ev->nsec / 1000000, ev);
+      0, ev->asio_event_attr.nsec / 1000000, ev);
 #else
     EV_SET(&event[i], (uintptr_t)ev, EVFILT_TIMER, EV_ADD | EV_ONESHOT,
       NOTE_NSECONDS, ev->asio_event_attr.nsec, ev);
@@ -319,7 +319,7 @@ PONY_API void __pony_asio_event_subscribe(asio_event_t* ev)
     new_action.sa_handler = SIG_IGN;
 
 #if !defined(USE_SCHEDULER_SCALING_PTHREADS)
-    if((int)ev->nsec == PONY_SCHED_SLEEP_WAKE_SIGNAL)
+    if(ev->asio_event_attr.nsec == PONY_SCHED_SLEEP_WAKE_SIGNAL)
       new_action.sa_handler = empty_signal_handler;
 #endif
     sigemptyset (&new_action.sa_mask);
@@ -360,7 +360,7 @@ PONY_API void pony_asio_event_update_nsec(asio_event_t* ev, uint64_t nsec)
 
 #ifdef PLATFORM_IS_BSD
     EV_SET(&event[i], (uintptr_t)ev, EVFILT_TIMER, EV_ADD | EV_ONESHOT,
-      0, ev->nsec / 1000000, ev);
+      0, ev->asio_event_attr.nsec / 1000000, ev);
 #else
     EV_SET(&event[i], (uintptr_t)ev, EVFILT_TIMER, EV_ADD | EV_ONESHOT,
       NOTE_NSECONDS, ev->asio_event_attr.nsec, ev);
@@ -430,7 +430,7 @@ PONY_API void pony_asio_event_unsubscribe(asio_event_t* ev)
     new_action.sa_handler = SIG_DFL;
 
 #if !defined(USE_SCHEDULER_SCALING_PTHREADS)
-    if((int)ev->nsec == PONY_SCHED_SLEEP_WAKE_SIGNAL)
+    if(ev->asio_event_attr.nsec == PONY_SCHED_SLEEP_WAKE_SIGNAL)
       new_action.sa_handler = empty_signal_handler;
 #endif
     sigemptyset (&new_action.sa_mask);

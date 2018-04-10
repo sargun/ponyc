@@ -380,7 +380,7 @@ PONY_API void __pony_asio_event_subscribe(asio_event_t* ev)
   epoll_ctl(b->epfd, EPOLL_CTL_ADD, ev->asio_event_attr.fd, &ep);
 }
 
-PONY_API void pony_asio_event_setnsec(asio_event_t* ev, uint64_t nsec)
+PONY_API void pony_asio_event_update_nsec(asio_event_t* ev, uint64_t nsec)
 {
   if((ev == NULL) ||
     (ev->flags == ASIO_DISPOSABLE) ||
