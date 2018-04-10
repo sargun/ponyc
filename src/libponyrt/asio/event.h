@@ -99,7 +99,7 @@ PONY_API void pony_asio_event_send(asio_event_t* ev, uint32_t flags,
  *
  *  This is the per-ASIO provider implementation of pony_asio_event_subscribe.
  */
-void __pony_asio_event_subscribe(asio_event_t* ev);
+void ponyint_pony_asio_event_subscribe(asio_event_t* ev);
 
 /** Update an event.
  *

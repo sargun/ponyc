@@ -305,7 +305,7 @@ static void timer_set_nsec(int fd, uint64_t nsec)
   timerfd_settime(fd, 0, &ts, NULL);
 }
 
-void __pony_asio_event_subscribe(asio_event_t* ev)
+void ponyint_pony_asio_event_subscribe(asio_event_t* ev)
 {
   if((ev == NULL) ||
     (ev->flags == ASIO_DISPOSABLE) ||

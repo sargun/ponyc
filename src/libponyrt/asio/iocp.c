@@ -258,7 +258,7 @@ void ponyint_iocp_resume_stdin()
 }
 
 
-void __pony_asio_event_subscribe(asio_event_t* ev)
+void ponyint_pony_asio_event_subscribe(asio_event_t* ev)
 {
   if((ev == NULL) ||
     (ev->flags == ASIO_DISPOSABLE) ||

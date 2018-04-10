@@ -261,7 +261,7 @@ DECLARE_THREAD_FN(ponyint_asio_backend_dispatch)
   return NULL;
 }
 
-void __pony_asio_event_subscribe(asio_event_t* ev)
+void ponyint_pony_asio_event_subscribe(asio_event_t* ev)
 {
   if((ev == NULL) ||
     (ev->flags == ASIO_DISPOSABLE) ||
